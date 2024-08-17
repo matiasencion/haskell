@@ -56,3 +56,32 @@ charToNum ch
 
 onThreeLines :: String -> String -> String -> String
 onThreeLines a b c = a ++ "\n" ++ b ++ "\n" ++ c ++ "\n"
+
+romanDigit :: Char -> String
+romanDigit ch 
+    | ch == '1'   = "I"
+    | ch == '2'   = "II"
+    | ch == '3'   = "III"
+    | ch == '4'   = "IV"
+    | ch == '5'   = "V"
+    | ch == '6'   = "VI"
+    | ch == '7'   = "VII"
+    | ch == '8'   = "VIII"
+    | ch == '9'   = "IX"
+    | otherwise = "No es un digito.\n"
+
+averageThree :: Integer -> Integer -> Integer -> Float
+averageThree x y z = fromIntegral(x + y + z) / 3
+
+howManyAboveAverage :: Integer -> Integer -> Integer -> Integer
+howManyAboveAverage x y z 
+    | fromInteger x > averageThree x y z && fromInteger y > averageThree x y z && fromInteger z > averageThree x y z = 3
+    | fromInteger x > averageThree x y z && fromInteger y > averageThree x y z || fromInteger x > averageThree x y z && fromInteger z > averageThree x y z || fromInteger y > averageThree x y z && fromInteger z > averageThree x y z    = 2
+    | fromInteger x > averageThree x y z || fromInteger y > averageThree x y z || fromInteger z > averageThree x y z   = 1
+    | otherwise = 0
+
+numberNDroots :: Float -> Float -> Float -> Integer
+numberNDroots a b c
+    | sqrt(b^2 - 4*a*c) > 0 = 2
+    | sqrt(b^2 - 4*a*c) == 0   = 1
+    | otherwise = 0
