@@ -167,3 +167,37 @@ capitalize str = [toCapitalLetter ch | ch <- str]
 
 capitalizeLetters :: String -> String
 capitalizeLetters str = [toCapitalLetter ch | ch <- str, isLetter ch]
+
+divisors :: Integer -> [Integer]
+divisors x = [n | n <- [1 .. x], mod x n == 0]
+
+isPrime :: Integer -> Bool
+isPrime x 
+    | x /= 1    = ([1, x] == divisors x)
+    | otherwise = True
+
+matches :: Integer -> [Integer] -> [Integer]
+matches x ls = [n | n <- ls, x == n]
+
+elem' :: Integer -> [Integer] -> Bool
+elem' x ls = (matches x ls /= [])
+
+onSeparateLines :: [String] -> String
+onSeparateLines [] = ""
+onSeparateLines (x:xs) = x ++ "\n" ++ onSeparateLines xs
+
+duplicate :: String -> Integer -> String
+duplicate str n
+    | n <= 0    = ""
+    | n == 1    = str
+    | otherwise = str ++ duplicate str (n-1)
+
+fibonacci :: Integer -> Integer
+fibonacci 0 = 0
+fibonacci 1 = 1
+fibonacci x = fibonacci (x-1) + fibonacci (x-2)
+
+fibTable :: Integer -> String
+fibTable x
+    | x == 0    = "n\t\tfib n\n0\t\t0\n"
+    | otherwise = fibTable (x-1) ++ show x ++ "\t\t" ++ show (fibonacci(x)) ++ "\n"
