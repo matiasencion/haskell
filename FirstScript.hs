@@ -110,3 +110,33 @@ middleThree x y z
 
 orderTriple :: (Integer, Integer, Integer) -> (Integer, Integer, Integer)
 orderTriple (x, y, z) = (minThree x y z, middleThree x y z, maxThree x y z)
+
+whereCrossXAxis :: Float -> Float -> Float -- RECIBE PENDIENTE Y ORDENADA EN EL ORIGEN y = a.x + b
+whereCrossXAxis a b = (-b) / a
+
+data Shape = Circle Float |
+            Rectangle Float Float |
+            Triangle Float Float 
+            deriving (Eq, Ord, Show)
+
+perimeter :: Shape -> Float
+perimeter (Circle r) = 2*pi*r
+perimeter (Rectangle a b) = 2*(a+b)
+perimeter (Triangle b h) = b +  2 * sqrt((b/2)^2 + h^2)
+
+isRound :: Shape -> Bool
+isRound (Circle _)          = True
+isRound (Rectangle _ _)     = False
+isRound (Triangle _ _)    = False
+
+area :: Shape -> Int
+area (Circle r) = pi*r^2
+area (Rectangle a b) = a*b
+area (Triangle b h) = b*h/2
+
+isRegular :: Shape -> Bool
+isRegular (Circle _)        = True
+isRegular (Rectangle _ _)   = True
+isRegular (Triangle b h)    = h^2 == (b/2)^2 + b^2
+
+data Item = Name String | Price Int
