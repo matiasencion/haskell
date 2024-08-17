@@ -102,3 +102,20 @@ crearParOrdenado :: Double -> Double -> ParOrdenado
 crearParOrdenado x y 
     | max x y == x  = ParOrdenado y x
     | otherwise     = ParOrdenado x y
+
+sumarParOrdenado :: ParOrdenado -> ParOrdenado -> ParOrdenado
+sumarParOrdenado (ParOrdenado a b) (ParOrdenado x y) = ParOrdenado (a+x) (b+y)
+
+multiplicarParOrdenado :: ParOrdenado -> Double -> ParOrdenado
+multiplicarParOrdenado (ParOrdenado x y) c = crearParOrdenado (x*c) y
+
+data Triangulo = Equi Int | Iso Int Int | Esca Int Int Int
+                deriving(Show)
+
+mkTriangulo :: Int -> Int -> Int -> Triangulo
+mkTriangulo a b c
+    | a == b && b == c  = Equi a
+    | a == b && a /= c  = Iso a c
+    | a == c && a /= b  = Iso a b 
+    | b == c && b /= a  = Iso b a
+    | otherwise         = Esca a b c 
