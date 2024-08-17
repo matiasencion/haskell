@@ -57,3 +57,48 @@ nombreCI (nom, ci, anio, cursos) = (nom, ci)
 
 anioIngreso :: Estudiante -> Int
 anioIngreso (nom, ci, anio, cursos) = anio
+
+cursosConNota :: Estudiante -> Int -> [Int]
+cursosConNota (nom, ci, anio, cursos) nota = [cod | (cnom, cod, cnota) <- cursos, cnota == nota]
+
+estudiantesAnioIngreso :: [Estudiante] -> Int -> [(String, Integer)]
+estudiantesAnioIngreso estudiantes anio = [nombreCI e | e <- estudiantes, anio == anioIngreso e]
+
+data Curso' = Curso' {
+    nombreCurso :: String,
+    codigo :: Int,
+    nota :: Int
+}
+
+data Estudiante' = Estudiante' {
+    nombreEstudiante :: String,
+    ci :: Integer,
+    anio :: Int,
+    cursos :: [Curso']
+} 
+
+gal' = Curso' "GAL" 1 8
+calculo' = Curso' "Calculo" 2 7
+fisica' = Curso' "Fisica" 3 6
+
+matias' = Estudiante' "Matias" 52639899 2019 [gal', fisica']
+
+nombreCI' :: Estudiante' -> (String, Integer)
+nombreCI' (Estudiante' nom ci _ _) = (nom, ci)
+
+anioIngreso' :: Estudiante' -> Int
+anioIngreso' (Estudiante' _ _ anio _) = anio
+
+cursosConNota' :: Estudiante' -> Int -> [Int]
+cursosConNota' (Estudiante' _ _ _ cursos) nota = [cod | (Curso' _ cod notaCurso) <- cursos, notaCurso == nota]
+
+estudiantesAnioIngreso' :: [Estudiante'] -> Int -> [(String, Integer)]
+estudiantesAnioIngreso' estudiantes anio = [(nom, ci) | (Estudiante' nom ci anioE _) <- estudiantes, anioE == anio]
+
+data ParOrdenado = ParOrdenado Double Double
+                deriving(Show)
+
+crearParOrdenado :: Double -> Double -> ParOrdenado 
+crearParOrdenado x y 
+    | max x y == x  = ParOrdenado y x
+    | otherwise     = ParOrdenado x y
