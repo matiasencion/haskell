@@ -85,3 +85,28 @@ numberNDroots a b c
     | sqrt(b^2 - 4*a*c) > 0 = 2
     | sqrt(b^2 - 4*a*c) == 0   = 1
     | otherwise = 0
+
+maxOccurs :: Integer -> Integer -> (Integer, Integer)
+maxOccurs x y
+    | x == y    = (x, 2)
+    | x > y     = (x, 1)
+    | x < y     = (y, 1)
+
+maxThreeOccurs :: Integer -> Integer -> Integer -> (Integer, Integer)
+maxThreeOccurs x y z 
+    | x == y && y == z   = (x, 3)
+    | x == y && x > z   = (x, 2)
+    | x == z && x > y   = (x, 2)
+    | y == z && y > x   = (y, 2)
+    | x > y && x > z    = (x, 1)
+    | y > x && y > z    = (y, 1)
+    | otherwise    = (z, 1)
+
+middleThree :: Integer -> Integer -> Integer -> Integer
+middleThree x y z
+    | max x y == y && max x z == x || min x y == y && min x z == x      = x
+    | max x y == x && max y z == y || min x y == x && min y z == y      = y
+    | max x z == x && max y z == z || min x z == x && min y z == z      = z
+
+orderTriple :: (Integer, Integer, Integer) -> (Integer, Integer, Integer)
+orderTriple (x, y, z) = (minThree x y z, middleThree x y z, maxThree x y z)
