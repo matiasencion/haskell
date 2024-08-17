@@ -115,28 +115,55 @@ whereCrossXAxis :: Float -> Float -> Float -- RECIBE PENDIENTE Y ORDENADA EN EL 
 whereCrossXAxis a b = (-b) / a
 
 data Shape = Circle Float |
-            Rectangle Float Float |
-            Triangle Float Float 
+            Rectangle Float Float
             deriving (Eq, Ord, Show)
 
 perimeter :: Shape -> Float
 perimeter (Circle r) = 2*pi*r
 perimeter (Rectangle a b) = 2*(a+b)
-perimeter (Triangle b h) = b +  2 * sqrt((b/2)^2 + h^2)
 
 isRound :: Shape -> Bool
 isRound (Circle _)          = True
 isRound (Rectangle _ _)     = False
-isRound (Triangle _ _)    = False
 
-area :: Shape -> Int
+area :: Shape -> Float
 area (Circle r) = pi*r^2
 area (Rectangle a b) = a*b
-area (Triangle b h) = b*h/2
 
 isRegular :: Shape -> Bool
 isRegular (Circle _)        = True
 isRegular (Rectangle _ _)   = True
-isRegular (Triangle b h)    = h^2 == (b/2)^2 + b^2
 
 data Item = Name String | Price Int
+
+isDigit :: Char -> Bool
+isDigit d = fromEnum d - fromEnum '0' >= 0 && fromEnum d - fromEnum '0' <= 9
+
+digits :: String -> String
+digits st = [d | d <- st, isDigit d]
+
+isEven :: Integer -> Bool
+isEven n = (mod n 2 == 0)
+
+allEven :: [Integer] -> Bool
+allEven ls = (ls == [n | n <- ls, isEven n])
+
+allOdd :: [Integer] -> Bool
+allOdd ls = ([] == [n | n <- ls, isEven n]) 
+
+doubleAll :: [Integer] -> [Integer]
+doubleAll ls = [2*n | n <- ls]
+
+isLetter :: Char -> Bool
+isLetter ch = (fromEnum ch >= 97 && fromEnum ch <= 122 || fromEnum ch >= 65 && fromEnum ch <= 90)
+
+toCapitalLetter :: Char -> Char
+toCapitalLetter ch 
+    | fromEnum(ch) >= 97 && fromEnum(ch) <= 122 = toEnum (fromEnum(ch) - 32)
+    | otherwise                                 = ch
+
+capitalize :: String -> String
+capitalize str = [toCapitalLetter ch | ch <- str]
+
+capitalizeLetters :: String -> String
+capitalizeLetters str = [toCapitalLetter ch | ch <- str, isLetter ch]
