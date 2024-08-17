@@ -40,3 +40,20 @@ calcularEdad :: Fecha -> Fecha -> Int
 calcularEdad (x,y,z) (d,m,a)
     | x >= d && y == m || m >= y = a - z
     | otherwise = a - z - 1
+
+type Curso = (String, Int, Int)--NOMBRE CODIGO NOTA
+type Estudiante = (String, Integer, Int, [Curso]) -- NOMBRE CI ANIO_DE_INGRESO CURSOS_APROVADOS
+
+gal, calculo, fisica :: Curso
+gal = ("GAL", 1, 8)
+calculo = ("Calculo", 2, 7)
+fisica = ("Fisica", 3, 6)
+
+matias :: Estudiante
+matias = ("Matias", 52639899, 2019, [gal, fisica])
+
+nombreCI :: Estudiante -> (String, Integer)
+nombreCI (nom, ci, anio, cursos) = (nom, ci) 
+
+anioIngreso :: Estudiante -> Int
+anioIngreso (nom, ci, anio, cursos) = anio
