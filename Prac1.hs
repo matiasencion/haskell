@@ -119,3 +119,16 @@ mkTriangulo a b c
     | a == c && a /= b  = Iso a b 
     | b == c && b /= a  = Iso b a
     | otherwise         = Esca a b c 
+
+head :: [Int] -> Int
+head x:_    = x
+
+tail :: [Int] -> [Int]
+tail _:xs    = xs
+
+null :: [Int] -> Bool
+null []     = True
+null _:_  = False
+
+dupList :: [Int] -> [Int]
+dupList x = x ++ x

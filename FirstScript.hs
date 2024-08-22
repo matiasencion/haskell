@@ -151,9 +151,6 @@ allEven ls = (ls == [n | n <- ls, isEven n])
 allOdd :: [Integer] -> Bool
 allOdd ls = ([] == [n | n <- ls, isEven n]) 
 
-doubleAll :: [Integer] -> [Integer]
-doubleAll ls = [2*n | n <- ls]
-
 isLetter :: Char -> Bool
 isLetter ch = (fromEnum ch >= 97 && fromEnum ch <= 122 || fromEnum ch >= 65 && fromEnum ch <= 90)
 
@@ -201,3 +198,52 @@ fibTable :: Integer -> String
 fibTable x
     | x == 0    = "n\t\tfib n\n0\t\t0\n"
     | otherwise = fibTable (x-1) ++ show x ++ "\t\t" ++ show (fibonacci(x)) ++ "\n"
+
+doubleAll :: [Integer] -> [Integer]
+doubleAll ls = [2*n | n <- ls]
+
+doubleAll' :: [Integer] -> [Integer]
+doubleAll' x = map double x
+
+doubleAll'' :: [Integer] -> [Integer]
+doubleAll'' [] = []
+doubleAll'' (x:xs) = 2*x : doubleAll'' xs
+
+to1 :: a -> Integer
+to1 x = 1 
+
+myLength :: [a] -> Integer
+myLength x = sum (map to1 x)
+
+greaterZero :: Integer -> Bool
+greaterZero n = n > 0
+
+less10 :: Integer -> Bool
+less10 n = n < 10
+
+addOne :: Integer -> Integer
+addOne n = n + 1
+
+addUp :: [Integer] -> [Integer]
+addUp ns = map addOne (filter greaterZero ns)
+
+add2 :: [Integer] -> [Integer]
+add2 ns = map addOne (map addOne ns)
+
+greaterZeroAndLess10 :: [Integer] -> [Integer]
+greaterZeroAndLess10 ns = filter greaterZero (filter less10 ns)
+
+squareAll :: [Integer] -> [Integer]
+squareAll ns = map square ns
+
+sumSquares :: [Integer] -> Integer
+sumSquares ns = sum (squareAll ns)
+
+checkAllGreater0 :: [Integer] -> Bool
+checkAllGreater0 ns = filter greaterZero ns == ns
+
+minF :: (Integer -> Integer) -> Integer -> Integer
+minF f n 
+    | n == 0    = f 0
+    | otherwise = if f n <= minF f (n - 1) then f n else minF f (n - 1)
+
