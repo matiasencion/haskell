@@ -1,4 +1,4 @@
-import Prelude hiding (flip, map, filter, length, all)
+import Prelude hiding (flip, map, filter, length, all, elem)
 
 twice :: (a -> a) -> (a -> a)
 twice f = f.f
@@ -36,3 +36,29 @@ length xs = sum (map (\x -> 1) xs)
 
 all :: (a -> Bool) -> [a] -> Bool
 all f xs = length (filter f xs) == length xs
+
+elem :: Eq a => a -> [a] -> Bool
+elem n xs = length(filter (\x -> x == n) xs) > 0
+
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' p xs = concat(map box xs)
+            where box ls 
+                    | p ls  = [ls]
+                    | otherwise = []
+
+data Triangulo = Equi Int | Iso Int Int | Esca Int Int Int
+                deriving(Eq)
+
+isos :: [Triangulo] -> Integer
+isos xs = length [x | x <- xs, case x of Iso _ _ -> True; _ -> False] 
+
+isos' :: [Triangulo] -> Integer
+isos' xs = length(filter (\x -> case x of Iso _ _ -> True; _ -> False) xs)
+
+type Matriz a = [[a]]
+
+columna :: Int -> Matriz a -> [a]
+columna i m = [head(drop i f) | f <- m]
+
+transpose :: Matriz a -> Matriz a
+transpose m = [columna i m | i <- [0 .. fromInteger(length (m !! 1) - 1)]]
