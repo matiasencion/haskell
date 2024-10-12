@@ -56,5 +56,19 @@ splitTR x = splitTRAux x True ([],[])
 
 maxIndTR :: Ord a => [a] -> (a, Int)
 maxIndTR (x:xs) = maxIndTRAux xs x 1 1
-maxIndTRAux [] max ind _= (max, ind)
-maxIndTRAux (x:xs) max ind count = if x > max then maxIndTRAux (xs) (x) (ind + count) 1 else maxIndTRAux (xs) (max) (ind) (count+1) 
+  where
+    maxIndTRAux [] max ind _= (max, ind)
+    maxIndTRAux (x:xs) max ind count = if x > max then maxIndTRAux (xs) (x) (ind + count) 1 else maxIndTRAux (xs) (max) (ind) (count+1) 
+
+takeWhileTR :: (a -> Bool) -> [a] -> [a]
+takeWhileTR f x = takeWhileTRAux f x []
+  where
+    takeWhileTRAux _ [] acc = acc
+    takeWhileTRAux f (x:xs) acc = if f (x) then takeWhileTRAux (f) (xs) (acc ++ [x]) else acc
+  
+dropWhileTR :: (a -> Bool) -> [a] -> [a]
+dropWhileTR f x = dropWhileTRAux f x True []
+  where 
+    dropWhileTRAux _ [] _ acc = acc
+    dropWhileTRAux f (x:xs) False acc = dropWhileTRAux (f) (xs) False (acc ++ [x])
+    dropWhileTRAux f (x:xs) True acc = if f (x) then dropWhileTRAux (f) (xs) True (acc) else dropWhileTRAux (f) (xs) False (acc ++ [x])
