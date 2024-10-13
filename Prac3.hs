@@ -72,3 +72,6 @@ dropWhileTR f x = dropWhileTRAux f x True []
     dropWhileTRAux _ [] _ acc = acc
     dropWhileTRAux f (x:xs) False acc = dropWhileTRAux (f) (xs) False (acc ++ [x])
     dropWhileTRAux f (x:xs) True acc = if f (x) then dropWhileTRAux (f) (xs) True (acc) else dropWhileTRAux (f) (xs) False (acc ++ [x])
+
+sumsSqsFL :: Num a => [a] -> a
+sumsSqsFL xs = foldl (\x y -> x + y*y) 0 xs
