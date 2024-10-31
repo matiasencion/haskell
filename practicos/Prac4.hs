@@ -26,4 +26,16 @@ foldN :: (a -> a) -> a -> Nat -> a
 foldN h e Zero = e
 foldN h e (Succ n) = h (foldN h e n)
 
+nat2intF :: Nat -> Int
+nat2intF n = foldN (+1) 0 n
 
+duplicaF :: Nat -> Nat
+duplicaF n = foldN (\x -> suma x (Succ(Succ(Zero)))) (Zero) n
+
+fib :: Nat -> Nat
+fib (Zero) = (Zero)
+fib (Succ(Zero)) = (Succ(Zero))
+fib (Succ n) = suma (fib n) (fib (predecesor(n)))
+
+data OurInt = IntZero | Pos Nat | Neg Nat
+instance OurInt Num
