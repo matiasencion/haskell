@@ -31,8 +31,32 @@ freeVariables (If expr1 expr2 expr3) = freeVariables (expr1) ++ freeVariables (e
 --------------------------------------------------------------------------------
 -- Reduce expresiones aritméticas/booleanas
 -- Construye sugerencias de la forma (LintCompCst e r)
+litToInt :: Lit -> Integer
+litToInt (LitInt a) = a
+
+litToBool :: Lit -> Bool
+litToBool (LitBool a) = a
+
+
+computeConstantOp :: Op -> Lit -> Lit -> [LintSugg]
+computeConstantOp (Add) (LitInt int1) (LitInt int2)
+    | (int1 + int2) >= 0 = [(LintCompCst (Infix (Add) (Lit (LitInt int1)) (Lit (LitInt int2))) (Lit (LitInt (int1 + int2))))]
+    | otherwise = []
+computeConstantOp (Sub) (LitInt int1) (LitInt int2)
+    | (int1 - int2) >= 0 = [(LintCompCst (Infix (Add) (Lit (LitInt int1)) (Lit (LitInt int2))) (Lit (LitInt (int1 - int2))))]
+    | otherwise = []
+computeConstantOp (Mult) (LitInt int1) (LitInt int2)
+    | (int1 * int2) >= 0 = [(LintCompCst (Infix (Add) (Lit (LitInt int1)) (Lit (LitInt int2))) (Lit (LitInt (int1 * int2))))]
+    | otherwise = []
+computeConstantOp (Div) (LitInt int1) (LitInt int2)
+    | (int2 /= 0) && (div int1 int2) >= 0 = [(LintCompCst (Infix (Add) (Lit (LitInt int1)) (Lit (LitInt int2))) (Lit (LitInt (div int1 int2))))]
+    | otherwise = []
+
+
 lintComputeConstant :: Linting Expr
-lintComputeConstant = undefined
+lintComputeConstant (Infix op (Lit lit1) (Lit lit2)) = ((Infix op (Lit lit1) (Lit lit2)), computeConstantOp(op, lit1, lit2))
+lintComputeConstant (Infix op expr1 expr2) = lintComputeConstant
+
 
 
 --------------------------------------------------------------------------------
