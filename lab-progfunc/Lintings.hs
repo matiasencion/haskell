@@ -10,15 +10,13 @@ import LintTypes
 
 -- Computa la lista de variables libres de una expresión
 freeVariables :: Expr -> [Name]
-freeVariables = freeVariablesAux
-    where 
-        freeVariablesAux (Var v) = [v]
-        freeVariablesAux (Lit _) = []
-        freeVariablesAux (Infix _ expr1 expr2) = freeVariablesAux (expr1) : freeVariablesAux (expr2)
-        freeVariablesAux (App expr1 expr2) = freeVariablesAux (expr1) : freeVariablesAux (expr2)
-        freeVariablesAux (Lam _ expr)  = freeVariablesAux (expr)
-        freeVariablesAux (Case expr1 expr2 (_, _, expr3)) = freeVariablesAux (expr1) : freeVariablesAux (expr2) : freeVariablesAux (expr3)
-        freeVariablesAux (If expr1 expr2 expr3) = freeVariablesAux (expr1) : freeVariablesAux (expr2) : freeVariablesAux (expr3)
+freeVariables (Var v) = [v]
+freeVariables (Lit _) = []
+freeVariables (Infix _ expr1 expr2) = freeVariables (expr1) ++ freeVariables (expr2)
+freeVariables (App expr1 expr2) = freeVariables (expr1) ++ freeVariables (expr2)
+freeVariables (Lam _ expr)  = freeVariables (expr)
+freeVariables (Case expr1 expr2 (_, _, expr3)) = freeVariables (expr1) ++ freeVariables (expr2) ++ freeVariables (expr3)
+freeVariables (If expr1 expr2 expr3) = freeVariables (expr1) ++ freeVariables (expr2) ++ freeVariables (expr3)
 
 --------------------------------------------------------------------------------
 -- LINTINGS
