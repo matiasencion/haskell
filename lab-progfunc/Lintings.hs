@@ -87,6 +87,8 @@ lintComputeConstant expr = (expr, [])
 -- Elimina chequeos de la forma e == True, True == e, e == False y False == e
 -- Construye sugerencias de la forma (LintBool e r)
 lintRedBool :: Linting Expr
+lintRedBool = undefined
+{-
 lintRedBool (Infix Eq (Lit (LitBool x)) expr)
     | x = (newExpr, sugg ++ [LintBool (Infix Eq (Lit (LitBool x)) expr) newExpr])
     | otherwise = (not newExpr, sugg ++ [LintBool (Infix Eq (Lit (LitBool x)) expr) (not newExpr)])
@@ -120,6 +122,7 @@ lintRedBool (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ su
 
 lintRedBool expr = (expr, [])
 
+-}
 --------------------------------------------------------------------------------
 -- Eliminación de if redundantes
 --------------------------------------------------------------------------------
