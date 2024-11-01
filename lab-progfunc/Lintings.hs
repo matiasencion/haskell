@@ -131,10 +131,10 @@ lintRedBool expr = (expr, [])
 -- Construye sugerencias de la forma (LintRedIf e r)
 
 lintRedIfCond :: Linting Expr
-lintRedIfCond (If (Lit (LintBool True)) expr1 expr2) = (newExpr1, sugg1 ++ [LintRedIf (If (Lit (LintBool True)) expr1 expr2) newExpr1])
+lintRedIfCond (If (Lit (LitBool True)) expr1 expr2) = (newExpr1, sugg1 ++ [LintRedIf (If (Lit (LitBool True)) expr1 expr2) newExpr1])
                                                     where (newExpr1, sugg1) = lintRedIfCond expr1
 
-lintRedIfCond (If (Lit (LintBool False)) expr1 expr2) = (newExpr2, sugg2 ++ [LintRedIf (If (Lit (LintBool False)) expr1 expr2) newExpr2])
+lintRedIfCond (If (Lit (LitBool False)) expr1 expr2) = (newExpr2, sugg2 ++ [LintRedIf (If (Lit (LitBool False)) expr1 expr2) newExpr2])
                                                     where (newExpr2, sugg2) = lintRedIfCond expr2
 
 lintRedIfCond (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
@@ -163,13 +163,37 @@ lintRedIfCond expr = (expr, [])
 -- Sustitución de if por conjunción entre la condición y su rama _then_
 -- Construye sugerencias de la forma (LintRedIf e r)
 lintRedIfAnd :: Linting Expr
-lintRedIfAnd = undefined
+lintRedIfAnd (If expr1 expr2 (Lit (LitBool False))) = (Infix And newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintRedIf ((If expr1 expr2 (Lit (LitBool False))) (Infix And newExpr1 newExpr2))])
+                                                    where (newExpr1, sugg1) = lintRedIfAnd expr1
+                                                          (newExpr2, sugg2) = lintRedIfAnd expr2
+
+lintRedIfAnd (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
+                                    where (newExpr1, sugg1) = lintRedIfAnd expr1
+                                          (newExpr2, sugg2) = lintRedIfAnd expr2
+
+lintRedIfAnd (App expr1 expr2) = (App newExpr1 newExpr2, sugg1 ++ sugg2)
+                                where (newExpr1, sugg1) = lintRedIfAnd expr1
+                                      (newExpr2, sugg2) = lintRedIfAnd expr2
+                                        
+lintRedIfAnd (Lam n expr) = (Lam n newExpr, sugg)
+                        where (newExpr, sugg) = lintRedIfAnd expr
+
+lintRedIfAnd (Case expr1 expr2 (n1, n2, expr3)) = (Case newExpr1 newExpr2 (n1, n2, newExpr3), sugg1 ++ sugg2 ++ sugg3)
+                                                where (newExpr1, sugg1) = lintRedIfAnd expr1
+                                                      (newExpr2, sugg2) = lintRedIfAnd expr2
+                                                      (newExpr3, sugg3) = lintRedIfAnd expr3
+
+lintRedIfAnd (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ sugg2 ++ sugg3)
+                                    where (newExpr1, sugg1) = lintRedIfAnd expr1
+                                          (newExpr2, sugg2) = lintRedIfAnd expr2
+                                          (newExpr3, sugg3) = lintRedIfAnd expr3
+
+lintRedIfAnd expr = (expr, [])
 
 --------------------------------------------------------------------------------
 -- Sustitución de if por disyunción entre la condición y su rama _else_
 -- Construye sugerencias de la forma (LintRedIf e r)
 lintRedIfOr :: Linting Expr
-lintRedIfOr = undefined
 lintRedIfOr (If expr1 (Lit (LitBool True)) expr2) = (Infix Or newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintRedIf ((If expr1 (Lit (LitBool True)) expr2) (Infix Or newExpr1 newExpr2))])
                                                     where (newExpr1, sugg1) = lintRedIfOr expr1
                                                           (newExpr2, sugg2) = lintRedIfOr expr2
