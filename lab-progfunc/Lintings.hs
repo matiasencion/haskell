@@ -228,7 +228,8 @@ lintRedIfOr expr = (expr, [])
 -- Construye sugerencias de la forma (LintNull e r)
 
 lintNull :: Linting Expr
-lintNull (Infix Eq expr (Lit (LitNil))) = (null newExpr, sugg ++ [LintNull (Infix Eq expr (Lit (LitNil))) (null newExpr)])
+lintNull = undefined
+{-lintNull (Infix Eq expr (Lit (LitNil))) = (null newExpr, sugg ++ [LintNull (Infix Eq expr (Lit (LitNil))) (null newExpr)])
                                         where (newExpr, sugg) = lintNull expr
 lintNull (Infix Eq (Lit (LitNil)) expr) = (null newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitNil)) expr) (null newExpr)])
                                         where (newExpr, sugg) = lintNull expr
@@ -258,7 +259,7 @@ lintNull (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ sugg2
                                       (newExpr2, sugg2) = lintNull expr2
                                       (newExpr3, sugg3) = lintNull expr3
 
-lintNull expr = (expr, [])
+lintNull expr = (expr, [])-}
 --------------------------------------------------------------------------------
 -- Eliminación de la concatenación
 --------------------------------------------------------------------------------
@@ -266,8 +267,32 @@ lintNull expr = (expr, [])
 -- Construye sugerencias de la forma (LintAppend e r)
 
 lintAppend :: Linting Expr
-lintAppend = undefined
+lintAppend (Infix Cons expr1 (Infix Append (Lit (LitNil)) expr2)) = (Infix Cons newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintAppend (Infix Cons expr1 (Infix Append (Lit (LitNil)) expr2)) (Infix Cons newExpr1 newExpr2)])
+                                                                    where (newExpr1, sugg1) = lintAppend expr1
+                                                                          (newExpr2, sugg2) = lintAppend expr2
 
+lintAppend (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
+                                    where (newExpr1, sugg1) = lintAppend expr1
+                                          (newExpr2, sugg2) = lintAppend expr2
+
+lintAppend (App expr1 expr2) = (App newExpr1 newExpr2, sugg1 ++ sugg2)
+                                where (newExpr1, sugg1) = lintAppend expr1
+                                      (newExpr2, sugg2) = lintAppend expr2
+                                        
+lintAppend (Lam n expr) = (Lam n newExpr, sugg)
+                        where (newExpr, sugg) = lintAppend expr
+
+lintAppend (Case expr1 expr2 (n1, n2, expr3)) = (Case newExpr1 newExpr2 (n1, n2, newExpr3), sugg1 ++ sugg2 ++ sugg3)
+                                                where (newExpr1, sugg1) = lintAppend expr1
+                                                      (newExpr2, sugg2) = lintAppend expr2
+                                                      (newExpr3, sugg3) = lintAppend expr3
+
+lintAppend (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ sugg2 ++ sugg3)
+                                    where (newExpr1, sugg1) = lintAppend expr1
+                                          (newExpr2, sugg2) = lintAppend expr2
+                                          (newExpr3, sugg3) = lintAppend expr3
+
+lintAppend expr = (expr, [])
 --------------------------------------------------------------------------------
 -- Composición
 --------------------------------------------------------------------------------
@@ -286,6 +311,7 @@ lintComp = undefined
 
 lintEta :: Linting Expr
 lintEta = undefined
+
 
 
 --------------------------------------------------------------------------------
@@ -310,7 +336,10 @@ liftToFunc = undefined
 
 -- encadenar transformaciones:
 (>==>) :: Linting a -> Linting a -> Linting a
-lint1 >==> lint2 = undefined
+lint1 >==> lint2 = \x -> 
+      let (res1, sugg1) = lint1 x
+          (res2, sugg2) = lint2 res1
+      in (res2, sugg1 ++ sugg2)
 
 -- aplica las transformaciones 'lints' repetidas veces y de forma incremental,
 -- hasta que ya no generen más cambios en 'func'

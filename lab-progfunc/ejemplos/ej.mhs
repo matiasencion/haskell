@@ -1,0 +1,3 @@
+prueba = x + 1 + 2
+ lintComputeConstant (Infix (Add) (Infix (Add) (Var "x") (Lit (LitInt 1))) (Infix (Add) (Lit (LitInt 1)) (Infix (Mult) (Lit (LitInt 1)) (Lit (LitInt 2)))))
+lintComputeConstant (Infix Add (Infix Add (Var "x") (Lit (LitInt 1))) (Infix Add (Lit (LitInt 1)) (Infix Mult (Lit (LitInt 2)) (Lit (LitInt 1)))))
