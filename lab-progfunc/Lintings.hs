@@ -89,14 +89,12 @@ lintComputeConstant expr = (expr, [])
 lintRedBool :: Linting Expr
 lintRedBool (Infix Eq (Lit (LitBool x)) expr)
     | x = (newExpr, sugg ++ [LintBool (Infix Eq (Lit (LitBool x)) expr) newExpr])
-        where (newExpr, sugg) = lintRedBool expr
     | otherwise = (not newExpr, sugg ++ [LintBool (Infix Eq (Lit (LitBool x)) expr) (not newExpr)])
         where (newExpr, sugg) = lintRedBool expr
 
 lintRedBool (Infix Eq expr (Lit (LitBool x)))
-    | x = (newExpr, sugg ++ [LintBool expr (Infix Eq (Lit (LitBool x))) newExpr])
-        where (newExpr, sugg) = lintRedBool expr
-    | otherwise = (not newExpr, sugg ++ [LintBool expr (Infix Eq (Lit (LitBool x))) (not newExpr)])
+    | x = (newExpr, sugg ++ [LintBool (Infix Eq expr (Lit (LitBool x))) newExpr])
+    | otherwise = (not newExpr, sugg ++ [LintBool (Infix Eq expr (Lit (LitBool x))) (not newExpr)])
         where (newExpr, sugg) = lintRedBool expr
 
 lintRedBool (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
@@ -163,7 +161,7 @@ lintRedIfCond expr = (expr, [])
 -- Sustitución de if por conjunción entre la condición y su rama _then_
 -- Construye sugerencias de la forma (LintRedIf e r)
 lintRedIfAnd :: Linting Expr
-lintRedIfAnd (If expr1 expr2 (Lit (LitBool False))) = (Infix And newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintRedIf ((If expr1 expr2 (Lit (LitBool False))) (Infix And newExpr1 newExpr2))])
+lintRedIfAnd (If expr1 expr2 (Lit (LitBool False))) = (Infix And newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintRedIf (If expr1 expr2 (Lit (LitBool False))) (Infix And newExpr1 newExpr2)])
                                                     where (newExpr1, sugg1) = lintRedIfAnd expr1
                                                           (newExpr2, sugg2) = lintRedIfAnd expr2
 
@@ -194,7 +192,7 @@ lintRedIfAnd expr = (expr, [])
 -- Sustitución de if por disyunción entre la condición y su rama _else_
 -- Construye sugerencias de la forma (LintRedIf e r)
 lintRedIfOr :: Linting Expr
-lintRedIfOr (If expr1 (Lit (LitBool True)) expr2) = (Infix Or newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintRedIf ((If expr1 (Lit (LitBool True)) expr2) (Infix Or newExpr1 newExpr2))])
+lintRedIfOr (If expr1 (Lit (LitBool True)) expr2) = (Infix Or newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintRedIf (If expr1 (Lit (LitBool True)) expr2) (Infix Or newExpr1 newExpr2)])
                                                     where (newExpr1, sugg1) = lintRedIfOr expr1
                                                           (newExpr2, sugg2) = lintRedIfOr expr2
 
