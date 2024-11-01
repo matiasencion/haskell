@@ -228,8 +228,37 @@ lintRedIfOr expr = (expr, [])
 -- Construye sugerencias de la forma (LintNull e r)
 
 lintNull :: Linting Expr
-lintNull = undefined
+lintNull (Infix Eq expr (Lit (LitNil))) = (null newExpr, sugg ++ [LintNull (Infix Eq expr (Lit (LitNil))) (null newExpr)])
+                                        where (newExpr, sugg) = lintNull expr
+lintNull (Infix Eq (Lit (LitNil)) expr) = (null newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitNil)) expr) (null newExpr)])
+                                        where (newExpr, sugg) = lintNull expr
+lintNull (Infix Eq (Lam "lenght" expr) (Lit (LitInt 0))) = (null newExpr, sugg ++ [LintNull (Infix Eq (Lam "lenght" expr) (Lit (LitInt 0))) (null newExpr)])
+                                                        where (newExpr, sugg) = lintNull expr
+lintNull (Infix Eq (Lit (LitInt 0)) (Lam "lenght" expr)) = (null newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitInt 0)) (Lam "lenght" expr)) (null newExpr)])
+                                                        where (newExpr, sugg) = lintNull expr
 
+lintNull (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
+                                where (newExpr1, sugg1) = lintNull expr1
+                                      (newExpr2, sugg2) = lintNull expr2
+
+lintNull (App expr1 expr2) = (App newExpr1 newExpr2, sugg1 ++ sugg2)
+                            where (newExpr1, sugg1) = lintNull expr1
+                                  (newExpr2, sugg2) = lintNull expr2
+                                        
+lintNull (Lam n expr) = (Lam n newExpr, sugg)
+                        where (newExpr, sugg) = lintNull expr
+
+lintNull (Case expr1 expr2 (n1, n2, expr3)) = (Case newExpr1 newExpr2 (n1, n2, newExpr3), sugg1 ++ sugg2 ++ sugg3)
+                                            where (newExpr1, sugg1) = lintNull expr1
+                                                  (newExpr2, sugg2) = lintNull expr2
+                                                  (newExpr3, sugg3) = lintNull expr3
+
+lintNull (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ sugg2 ++ sugg3)
+                                where (newExpr1, sugg1) = lintNull expr1
+                                      (newExpr2, sugg2) = lintNull expr2
+                                      (newExpr3, sugg3) = lintNull expr3
+
+lintNull expr = (expr, [])
 --------------------------------------------------------------------------------
 -- Eliminación de la concatenación
 --------------------------------------------------------------------------------
