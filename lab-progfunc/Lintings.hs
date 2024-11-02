@@ -14,8 +14,8 @@ freeVariables (Var v) = [v]
 freeVariables (Lit _) = []
 freeVariables (Infix _ expr1 expr2) = freeVariables (expr1) ++ freeVariables (expr2)
 freeVariables (App expr1 expr2) = freeVariables (expr1) ++ freeVariables (expr2)
-freeVariables (Lam _ expr)  = freeVariables (expr)
-freeVariables (Case expr1 expr2 (_, _, expr3)) = freeVariables (expr1) ++ freeVariables (expr2) ++ freeVariables (expr3)
+freeVariables (Lam x expr)  = [y | y <- freeVariables (expr), y /= x]
+freeVariables (Case expr1 expr2 (x, xs, expr3)) = freeVariables (expr1) ++ freeVariables (expr2) ++ [y | y <- freeVariables (expr3), y /= x && y /= x]
 freeVariables (If expr1 expr2 expr3) = freeVariables (expr1) ++ freeVariables (expr2) ++ freeVariables (expr3)
 
 --------------------------------------------------------------------------------
@@ -121,7 +121,6 @@ lintRedBool (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ su
                                                   (newExpr3, sugg3) = lintRedBool expr3
 
 lintRedBool expr = (expr, [])
-
 -}
 --------------------------------------------------------------------------------
 -- Eliminación de if redundantes
@@ -300,8 +299,28 @@ lintAppend expr = (expr, [])
 -- Construye sugerencias de la forma (LintComp e r)
 
 lintComp :: Linting Expr
-lintComp = undefined
+lintComp (App expr1 (App expr2 expr3)) = (Infix Comp expr1 newExpr, sugg ++ [LintComp (App expr1 (App expr2 expr3)) (Infix Comp expr1 newExpr)]) 
+                                          where (newExpr, sugg) = lintComp (App expr2 expr3)
 
+lintComp (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
+                              where (newExpr1, sugg1) = lintComp expr1
+                                    (newExpr2, sugg2) = lintComp expr2
+
+lintComp (App expr1 expr2) = (App newExpr1 newExpr2, sugg1 ++ sugg2)
+                              where (newExpr1, sugg1) = lintComp expr1
+                                    (newExpr2, sugg2) = lintComp expr2
+
+lintComp (Case expr1 expr2 (x,xs,expr3)) = (Case newExpr1 newExpr2 (x,xs,newExpr3), sugg1 ++ sugg2 ++ sugg3)
+                                          where (newExpr1, sugg1) = lintComp expr1
+                                                (newExpr2, sugg2) = lintComp expr2
+                                                (newExpr3, sugg3) = lintComp expr3
+
+lintComp (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ sugg2 ++ sugg3)
+                              where (newExpr1, sugg1) = lintComp expr1
+                                    (newExpr2, sugg2) = lintComp expr2
+                                    (newExpr3, sugg3) = lintComp expr3
+
+lintComp expr = (expr, [])
 
 --------------------------------------------------------------------------------
 -- Eta Redución
