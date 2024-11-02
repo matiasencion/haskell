@@ -373,7 +373,9 @@ lintMap = undefined
 -- Dada una transformación a nivel de expresión, se construye
 -- una transformación a nivel de función
 liftToFunc :: Linting Expr -> Linting FunDef
-liftToFunc = undefined
+liftToFunc linting (FunDef x expr) = (FunDef x newExpr, sugg)
+                                    where (newExpr, sugg) = linting expr
+
 
 -- encadenar transformaciones:
 (>==>) :: Linting a -> Linting a -> Linting a
