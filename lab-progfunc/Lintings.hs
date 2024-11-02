@@ -387,5 +387,5 @@ lint1 >==> lint2 = \x ->
 -- aplica las transformaciones 'lints' repetidas veces y de forma incremental,
 -- hasta que ya no generen más cambios en 'func'
 lintRec :: Linting a -> Linting a
-lintRec lints func = if null (snd newFunc) then newFunc else lintRec lints (fst newFunc)
+lintRec lints func = if null (snd newFunc) then newFunc else lintRec lints (fst newFunc) --PROBLEMA ACA, PIERDO LAS SUGERENCIAS ANTERIORES
                   where newFunc = lints func
