@@ -310,6 +310,9 @@ lintComp (App expr1 expr2) = (App newExpr1 newExpr2, sugg1 ++ sugg2)
                               where (newExpr1, sugg1) = lintComp expr1
                                     (newExpr2, sugg2) = lintComp expr2
 
+lintComp (Lam x expr) = (Lam x newExpr, sugg)
+                        where (newExpr, sugg) = lintComp expr
+
 lintComp (Case expr1 expr2 (x,xs,expr3)) = (Case newExpr1 newExpr2 (x,xs,newExpr3), sugg1 ++ sugg2 ++ sugg3)
                                           where (newExpr1, sugg1) = lintComp expr1
                                                 (newExpr2, sugg2) = lintComp expr2
@@ -329,9 +332,30 @@ lintComp expr = (expr, [])
 -- Construye sugerencias de la forma (LintEta e r)
 
 lintEta :: Linting Expr
-lintEta = undefined
+lintEta (Lam x (App expr (Var y))) = if x == y && elem x (freeVariables expr) then (Lam x (App expr (Var x)), []) else (expr, [LintEta (Lam x (App expr (Var x))) expr])
 
+lintEta (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
+                              where (newExpr1, sugg1) = lintEta expr1
+                                    (newExpr2, sugg2) = lintEta expr2
 
+lintEta (App expr1 expr2) = (App newExpr1 newExpr2, sugg1 ++ sugg2)
+                              where (newExpr1, sugg1) = lintEta expr1
+                                    (newExpr2, sugg2) = lintEta expr2
+
+lintEta (Lam x expr) = (Lam x newExpr, sugg)
+                        where (newExpr, sugg) = lintEta expr
+
+lintEta (Case expr1 expr2 (x,xs,expr3)) = (Case newExpr1 newExpr2 (x,xs,newExpr3), sugg1 ++ sugg2 ++ sugg3)
+                                          where (newExpr1, sugg1) = lintEta expr1
+                                                (newExpr2, sugg2) = lintEta expr2
+                                                (newExpr3, sugg3) = lintEta expr3
+
+lintEta (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ sugg2 ++ sugg3)
+                              where (newExpr1, sugg1) = lintEta expr1
+                                    (newExpr2, sugg2) = lintEta expr2
+                                    (newExpr3, sugg3) = lintEta expr3
+
+lintEta expr = (expr, [])
 
 --------------------------------------------------------------------------------
 -- Eliminación de recursión con map
