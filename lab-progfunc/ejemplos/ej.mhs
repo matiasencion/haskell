@@ -9,3 +9,13 @@ lintRedIfOrPRUEBA = if c then True else e
 
 lintNullPRUEBA_1 = e == []
 lintNullPRUEBA_2 = length e == 0
+
+lintAppendPRUEBA = x : [] ++ (y : [] ++ ys)
+
+lintCompPRUEBA = f (g (h x))
+
+lintEtaPRUEBA = \y -> (\x -> f y x) y
+
+lintMapPRUEBA = \ls -> case ls of
+    [] -> [];
+    (x : xs) -> (x + 1) : incr xs
