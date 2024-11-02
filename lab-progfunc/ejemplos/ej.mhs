@@ -1,1 +1,11 @@
-prueba = (1+2)
+lintComputeConstantsPRUEBA = x + 1 + (1 + 2 * 1)
+
+lintRedBoolPRUEBA_TRUE = (x == True) || (True == y)
+lintRedBoolPRUEBA_FALSE = (x == False) || (False == y)
+
+lintRedIfCondPRUEBA = if True then x + if False then 1 else 2 else 3
+lintRedIfAndPRUEBA = if c then e else False
+lintRedIfOrPRUEBA = if c then True else e
+
+lintNullPRUEBA_1 = e == []
+lintNullPRUEBA_2 = length e == 0

@@ -229,9 +229,9 @@ lintNull (Infix Eq expr (Lit (LitNil))) = (App (Var "null") newExpr, sugg ++ [Li
                                         where (newExpr, sugg) = lintNull expr
 lintNull (Infix Eq (Lit (LitNil)) expr) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitNil)) expr) (App (Var "null") newExpr)])
                                         where (newExpr, sugg) = lintNull expr
-lintNull (Infix Eq (Lam "lenght" expr) (Lit (LitInt 0))) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq (Lam "lenght" expr) (Lit (LitInt 0))) (App (Var "null") newExpr)])
+lintNull (Infix Eq (App (Var "length") expr) (Lit (LitInt 0))) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq (App (Var "length") expr) (Lit (LitInt 0))) (App (Var "null") newExpr)])
                                                         where (newExpr, sugg) = lintNull expr
-lintNull (Infix Eq (Lit (LitInt 0)) (Lam "lenght" expr)) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitInt 0)) (Lam "lenght" expr)) (App (Var "null") newExpr)])
+lintNull (Infix Eq (Lit (LitInt 0)) (App (Var "length") expr)) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitInt 0)) (App (Var "length") expr)) (App (Var "null") newExpr)])
                                                         where (newExpr, sugg) = lintNull expr
 
 lintNull (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
