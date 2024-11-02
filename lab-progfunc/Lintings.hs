@@ -87,16 +87,14 @@ lintComputeConstant expr = (expr, [])
 -- Elimina chequeos de la forma e == True, True == e, e == False y False == e
 -- Construye sugerencias de la forma (LintBool e r)
 lintRedBool :: Linting Expr
-lintRedBool = undefined
-{-
 lintRedBool (Infix Eq (Lit (LitBool x)) expr)
     | x = (newExpr, sugg ++ [LintBool (Infix Eq (Lit (LitBool x)) expr) newExpr])
-    | otherwise = (not newExpr, sugg ++ [LintBool (Infix Eq (Lit (LitBool x)) expr) (not newExpr)])
+    | otherwise = (App (Var "not") newExpr, sugg ++ [LintBool (Infix Eq (Lit (LitBool x)) expr) (App (Var "not") newExpr)])
         where (newExpr, sugg) = lintRedBool expr
 
 lintRedBool (Infix Eq expr (Lit (LitBool x)))
     | x = (newExpr, sugg ++ [LintBool (Infix Eq expr (Lit (LitBool x))) newExpr])
-    | otherwise = (not newExpr, sugg ++ [LintBool (Infix Eq expr (Lit (LitBool x))) (not newExpr)])
+    | otherwise = (App (Var "not") newExpr, sugg ++ [LintBool (Infix Eq expr (Lit (LitBool x))) (App (Var "not") newExpr)])
         where (newExpr, sugg) = lintRedBool expr
 
 lintRedBool (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
@@ -121,7 +119,7 @@ lintRedBool (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ su
                                                   (newExpr3, sugg3) = lintRedBool expr3
 
 lintRedBool expr = (expr, [])
--}
+
 --------------------------------------------------------------------------------
 -- Eliminación de if redundantes
 --------------------------------------------------------------------------------
@@ -227,14 +225,13 @@ lintRedIfOr expr = (expr, [])
 -- Construye sugerencias de la forma (LintNull e r)
 
 lintNull :: Linting Expr
-lintNull = undefined
-{-lintNull (Infix Eq expr (Lit (LitNil))) = (null newExpr, sugg ++ [LintNull (Infix Eq expr (Lit (LitNil))) (null newExpr)])
+lintNull (Infix Eq expr (Lit (LitNil))) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq expr (Lit (LitNil))) (App (Var "null") newExpr)])
                                         where (newExpr, sugg) = lintNull expr
-lintNull (Infix Eq (Lit (LitNil)) expr) = (null newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitNil)) expr) (null newExpr)])
+lintNull (Infix Eq (Lit (LitNil)) expr) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitNil)) expr) (App (Var "null") newExpr)])
                                         where (newExpr, sugg) = lintNull expr
-lintNull (Infix Eq (Lam "lenght" expr) (Lit (LitInt 0))) = (null newExpr, sugg ++ [LintNull (Infix Eq (Lam "lenght" expr) (Lit (LitInt 0))) (null newExpr)])
+lintNull (Infix Eq (Lam "lenght" expr) (Lit (LitInt 0))) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq (Lam "lenght" expr) (Lit (LitInt 0))) (App (Var "null") newExpr)])
                                                         where (newExpr, sugg) = lintNull expr
-lintNull (Infix Eq (Lit (LitInt 0)) (Lam "lenght" expr)) = (null newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitInt 0)) (Lam "lenght" expr)) (null newExpr)])
+lintNull (Infix Eq (Lit (LitInt 0)) (Lam "lenght" expr)) = (App (Var "null") newExpr, sugg ++ [LintNull (Infix Eq (Lit (LitInt 0)) (Lam "lenght" expr)) (App (Var "null") newExpr)])
                                                         where (newExpr, sugg) = lintNull expr
 
 lintNull (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
@@ -258,7 +255,7 @@ lintNull (If expr1 expr2 expr3) = (If newExpr1 newExpr2 newExpr3, sugg1 ++ sugg2
                                       (newExpr2, sugg2) = lintNull expr2
                                       (newExpr3, sugg3) = lintNull expr3
 
-lintNull expr = (expr, [])-}
+lintNull expr = (expr, [])
 --------------------------------------------------------------------------------
 -- Eliminación de la concatenación
 --------------------------------------------------------------------------------
@@ -365,6 +362,7 @@ lintEta expr = (expr, [])
 -- Construye sugerencias de la forma (LintMap f r)
 lintMap :: Linting FunDef
 lintMap = undefined
+--lintMap (FunDef func1 (Lam l1  (Case l2 (Lit (LitNil)) (x,xs1,(Infix Cons expr (App func2 xs2)))))) = if func1 == func2 && l1 == l2 && xs1 == xs2 then (FunDef func1 (App (Var "map") (Lam x expr)), [LintMap (FunDef func1 (Lam l1  (Case l2 (Lit (LitNil)) (x,xs1,(Infix Cons expr (App func2 xs2)))))) (FunDef func1 (App (Var "map") (Lam x expr)))])
 
 
 --------------------------------------------------------------------------------
