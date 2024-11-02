@@ -361,9 +361,9 @@ lintEta expr = (expr, [])
 -- Sustituye recursión sobre listas por `map`
 -- Construye sugerencias de la forma (LintMap f r)
 lintMap :: Linting FunDef
-lintMap = undefined
---lintMap (FunDef func1 (Lam l1  (Case l2 (Lit (LitNil)) (x,xs1,(Infix Cons expr (App func2 xs2)))))) = if func1 == func2 && l1 == l2 && xs1 == xs2 then (FunDef func1 (App (Var "map") (Lam x expr)), [LintMap (FunDef func1 (Lam l1  (Case l2 (Lit (LitNil)) (x,xs1,(Infix Cons expr (App func2 xs2)))))) (FunDef func1 (App (Var "map") (Lam x expr)))])
+lintMap (FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, (Infix Cons expr (App (Var f2) (Var xs2))))))) = if f1 == f2 && l1 == l2 && xs1 == xs2 then (FunDef f1 (Lam x expr), [LintMap ((FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, (Infix Cons expr (App (Var f2) (Var xs2)))))))) (FunDef f1 (Lam x expr))]) else ((FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, (Infix Cons expr (App (Var f2) (Var xs2))))))), [])
 
+lintMap funcDef = (funcDef, [])
 
 --------------------------------------------------------------------------------
 -- Combinación de Lintings
