@@ -1,4 +1,4 @@
-lintComputeConstantsPRUEBA = x + 1 + (1 + 2 * 1)
+lintComputeConstantPRUEBA = x + 1 + (1 + 2 * 1)
 
 lintRedBoolPRUEBA_TRUE = (x == True) || (True == y)
 lintRedBoolPRUEBA_FALSE = (x == False) || (False == y)

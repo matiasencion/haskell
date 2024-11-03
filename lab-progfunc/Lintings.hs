@@ -263,7 +263,7 @@ lintNull expr = (expr, [])
 -- Construye sugerencias de la forma (LintAppend e r)
 
 lintAppend :: Linting Expr
-lintAppend (Infix Cons expr1 (Infix Append (Lit (LitNil)) expr2)) = (Infix Cons newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintAppend (Infix Cons expr1 (Infix Append (Lit (LitNil)) expr2)) (Infix Cons newExpr1 newExpr2)])
+lintAppend (Infix Append (Infix Cons expr1 (Lit (LitNil))) expr2) = (Infix Cons newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintAppend (Infix Cons expr1 (Infix Append (Lit (LitNil)) expr2)) (Infix Cons newExpr1 newExpr2)])
                                                                     where (newExpr1, sugg1) = lintAppend expr1
                                                                           (newExpr2, sugg2) = lintAppend expr2
 
@@ -386,6 +386,10 @@ lint1 >==> lint2 = \x ->
 
 -- aplica las transformaciones 'lints' repetidas veces y de forma incremental,
 -- hasta que ya no generen más cambios en 'func'
-lintRec :: Linting a -> Linting a
-lintRec lints func = if null (snd newFunc) then newFunc else lintRec lints (fst newFunc) --PROBLEMA ACA, PIERDO LAS SUGERENCIAS ANTERIORES
+
+lintRecAux :: Linting a -> [LintSugg] -> Linting a
+lintRecAux lints acc func = if null (snd newFunc) then (fst newFunc, acc) else lintRecAux lints ((snd newFunc) ++ acc) (fst newFunc) --PROBLEMA ACA, PIERDO LAS SUGERENCIAS ANTERIORES
                   where newFunc = lints func
+
+lintRec :: Linting a -> Linting a
+lintRec lints func = lintRecAux lints [] func
