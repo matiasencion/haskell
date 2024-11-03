@@ -295,9 +295,11 @@ lintAppend expr = (expr, [])
 -- se aplica en casos de la forma (f (g t)), reemplazando por (f . g) t
 -- Construye sugerencias de la forma (LintComp e r)
 
-lintComp :: Linting Expr
-lintComp (App expr1 (App expr2 expr3)) = (Infix Comp expr1 newExpr, sugg ++ [LintComp (App expr1 (App expr2 expr3)) (Infix Comp expr1 newExpr)]) 
-                                          where (newExpr, sugg) = lintComp (App expr2 expr3)
+lintComp :: Linting Expr -- revisar el orden, posible solucion (App expr1 (App expr2 (Var x)))) en paso base
+lintComp (App expr1 (App expr2 expr3)) = (App (Infix Comp newExpr1 newExpr2) newExpr3, sugg1 ++ sugg2 ++ sugg3 ++ [LintComp (App expr1 (App expr2 expr3)) (App (Infix Comp newExpr1 newExpr2) newExpr3)]) 
+                                          where (newExpr1, sugg1) = lintComp expr1
+                                                (newExpr2, sugg2) = lintComp expr2
+                                                (newExpr3, sugg3) = lintComp expr3
 
 lintComp (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
                               where (newExpr1, sugg1) = lintComp expr1
@@ -328,8 +330,8 @@ lintComp expr = (expr, [])
 -- se aplica en casos de la forma \x -> e x, reemplazando por e
 -- Construye sugerencias de la forma (LintEta e r)
 
-lintEta :: Linting Expr
-lintEta (Lam x (App expr (Var y))) = if x == y && elem x (freeVariables expr) then (Lam x (App expr (Var x)), []) else (expr, [LintEta (Lam x (App expr (Var x))) expr])
+lintEta :: Linting Expr -- el resultado no es exacto, habria que evaluar la variable y en expr
+lintEta (Lam x (App expr (Var y))) = if x == y &&  not (elem x (freeVariables expr)) then (Lam x (App expr (Var x)), []) else (expr, [LintEta (Lam x (App expr (Var x))) expr])
 
 lintEta (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
                               where (newExpr1, sugg1) = lintEta expr1
@@ -361,7 +363,7 @@ lintEta expr = (expr, [])
 -- Sustituye recursión sobre listas por `map`
 -- Construye sugerencias de la forma (LintMap f r)
 lintMap :: Linting FunDef
-lintMap (FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, (Infix Cons expr (App (Var f2) (Var xs2))))))) = if f1 == f2 && l1 == l2 && xs1 == xs2 then (FunDef f1 (Lam x expr), [LintMap ((FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, (Infix Cons expr (App (Var f2) (Var xs2)))))))) (FunDef f1 (Lam x expr))]) else ((FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, (Infix Cons expr (App (Var f2) (Var xs2))))))), [])
+lintMap (FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, Infix Cons expr (App (Var f2) (Var xs2)))))) = if f1 == f2 && l1 == l2 && xs1 == xs2 then (FunDef f1 (App (Var "map") (Lam x expr)), [LintMap ((FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, (Infix Cons expr (App (Var f2) (Var xs2)))))))) (FunDef f1 (App (Var "map") (Lam x expr)))]) else ((FunDef f1 (Lam l1 (Case (Var l2) (Lit (LitNil)) (x, xs1, (Infix Cons expr (App (Var f2) (Var xs2))))))), [])
 
 lintMap funcDef = (funcDef, [])
 

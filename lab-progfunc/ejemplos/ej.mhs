@@ -16,6 +16,8 @@ lintCompPRUEBA = f (g (h x))
 
 lintEtaPRUEBA = \y -> (\x -> f y x) y
 
-lintMapPRUEBA = \ls -> case ls of
-    [] -> [];
-    (x : xs) -> (x + 1) : incr xs
+incr = \ls -> case ls of
+[] -> [];
+(x : xs) -> (x + 1) : incr xs
+
+    
