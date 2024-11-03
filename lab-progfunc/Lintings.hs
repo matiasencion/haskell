@@ -295,11 +295,10 @@ lintAppend expr = (expr, [])
 -- se aplica en casos de la forma (f (g t)), reemplazando por (f . g) t
 -- Construye sugerencias de la forma (LintComp e r)
 
-lintComp :: Linting Expr -- revisar el orden, posible solucion (App expr1 (App expr2 (Var x)))) en paso base
-lintComp (App expr1 (App expr2 expr3)) = (App (Infix Comp newExpr1 newExpr2) newExpr3, sugg1 ++ sugg2 ++ sugg3 ++ [LintComp (App expr1 (App expr2 expr3)) (App (Infix Comp newExpr1 newExpr2) newExpr3)]) 
+lintComp :: Linting Expr -- revisar el orden en que se imprimen las sugerencias !!!! CUIDADO CON (Var x) en el pattern matchin, podria ser una Expr general
+lintComp (App expr1 (App expr2 (Var x))) = (App (Infix Comp newExpr1 newExpr2) (Var x), sugg1 ++ sugg2 ++ [LintComp (App expr1 (App expr2 (Var x))) (App (Infix Comp newExpr1 newExpr2) (Var x))]) 
                                           where (newExpr1, sugg1) = lintComp expr1
                                                 (newExpr2, sugg2) = lintComp expr2
-                                                (newExpr3, sugg3) = lintComp expr3
 
 lintComp (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
                               where (newExpr1, sugg1) = lintComp expr1
@@ -390,7 +389,7 @@ lint1 >==> lint2 = \x ->
 -- hasta que ya no generen más cambios en 'func'
 
 lintRecAux :: Linting a -> [LintSugg] -> Linting a
-lintRecAux lints acc func = if null (snd newFunc) then (fst newFunc, acc) else lintRecAux lints ((snd newFunc) ++ acc) (fst newFunc) --PROBLEMA ACA, PIERDO LAS SUGERENCIAS ANTERIORES
+lintRecAux lints acc func = if null (snd newFunc) then (fst newFunc, acc) else lintRecAux lints (acc ++ (snd newFunc)) (fst newFunc) 
                   where newFunc = lints func
 
 lintRec :: Linting a -> Linting a
