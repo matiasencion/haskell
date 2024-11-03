@@ -295,7 +295,7 @@ lintAppend expr = (expr, [])
 -- se aplica en casos de la forma (f (g t)), reemplazando por (f . g) t
 -- Construye sugerencias de la forma (LintComp e r)
 
-lintComp :: Linting Expr -- revisar el orden en que se imprimen las sugerencias !!!! CUIDADO CON (Var x) en el pattern matchin, podria ser una Expr general
+lintComp :: Linting Expr -- !!!! CUIDADO CON (Var x) en el pattern matching, podria ser una Expr general
 lintComp (App expr1 (App expr2 (Var x))) = (App (Infix Comp newExpr1 newExpr2) (Var x), sugg1 ++ sugg2 ++ [LintComp (App expr1 (App expr2 (Var x))) (App (Infix Comp newExpr1 newExpr2) (Var x))]) 
                                           where (newExpr1, sugg1) = lintComp expr1
                                                 (newExpr2, sugg2) = lintComp expr2
@@ -329,8 +329,8 @@ lintComp expr = (expr, [])
 -- se aplica en casos de la forma \x -> e x, reemplazando por e
 -- Construye sugerencias de la forma (LintEta e r)
 
-lintEta :: Linting Expr -- el resultado no es exacto, habria que evaluar la variable y en expr
-lintEta (Lam x (App expr (Var y))) = if x == y &&  not (elem x (freeVariables expr)) then (Lam x (App expr (Var x)), []) else (expr, [LintEta (Lam x (App expr (Var x))) expr])
+lintEta :: Linting Expr -- el resultado no es exacto, habria que evaluar la variable y en expr ---- no esta bien la recursion, tiene que ser de adentro hacia afuera
+lintEta (Lam x (App expr (Var y))) = if x == y && not (elem x (freeVariables expr)) then (expr, [LintEta (Lam x (App expr (Var x))) expr]) else (Lam x (App expr (Var y)), [])
 
 lintEta (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
                               where (newExpr1, sugg1) = lintEta expr1
