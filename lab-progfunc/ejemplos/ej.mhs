@@ -14,7 +14,7 @@ lintAppendPRUEBA = x : [] ++ (y : [] ++ ys)
 
 lintCompPRUEBA = f (g (h x))
 
-lintEtaPRUEBA = \y -> null y
+lintEtaPRUEBA = \y -> (\x -> x  + 1) y
 
 incr = \ls -> case ls of
 [] -> [];
