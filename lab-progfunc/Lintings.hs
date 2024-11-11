@@ -299,11 +299,7 @@ lintAppend expr = (expr, [])
 -- se aplica en casos de la forma (f (g t)), reemplazando por (f . g) t
 -- Construye sugerencias de la forma (LintComp e r)
 
-lintComp :: Linting Expr -- !!!! CUIDADO CON (Var x) en el pattern matching, podria ser una Expr general
---lintComp (App expr1 (App expr2 (Var x))) = (App (Infix Comp expr1 expr2) (Var x), [LintComp (App expr1 (App expr2 (Var x))) (App (Infix Comp expr1 expr2) (Var x))]) 
-
---lintComp (App expr1 (App expr2 (Lit x))) = (App (Infix Comp expr1 expr2) (Lit x), [LintComp (App expr1 (App expr2 (Lit x))) (App (Infix Comp expr1 expr2) (Lit x))]) 
-
+lintComp :: Linting Expr
 lintComp (App expr1 (App expr2 expr3)) = (App (Infix Comp expr1 expr2) expr3, [LintComp (App expr1 (App expr2 expr3)) (App (Infix Comp expr1 expr2) expr3)]) 
 
 lintComp (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
@@ -336,8 +332,6 @@ lintComp expr = (expr, [])
 -- Construye sugerencias de la forma (LintEta e r)
 
 lintEta :: Linting Expr
---lintEta (Lam x (App expr (Var y))) = if x == y && not (elem x (freeVariables expr)) then (expr, [LintEta (Lam x (App expr (Var x))) expr]) else (Lam x (App expr (Var y)), [])
-
 lintEta (Lam x (App (Var e) (Var y))) = if x == y && not (elem x (freeVariables (Var e))) then (Var e, [LintEta (Lam x (App (Var e) (Var x))) (Var e)]) else (Lam x (App (Var e) (Var y)), [])
 
 lintEta (Lam x (App expr (Var y))) = if x == y && not (elem x (freeVariables newExpr)) then (newExpr, sugg ++ [LintEta (Lam x (App newExpr (Var x))) newExpr]) else (Lam x (App newExpr (Var y)), sugg)
