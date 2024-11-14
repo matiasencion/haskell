@@ -299,8 +299,19 @@ lintAppend expr = (expr, [])
 -- se aplica en casos de la forma (f (g t)), reemplazando por (f . g) t
 -- Construye sugerencias de la forma (LintComp e r)
 
+auxComp :: Expr -> Bool
+auxComp (App _ _) = False
+auxComp n = True
+
+getComp :: Expr -> (Expr, Expr)
+getComp (App (Infix Comp expr1 expr2) expr3) = (Infix Comp expr1 expr2, expr3)
+
 lintComp :: Linting Expr
-lintComp (App expr1 (App expr2 expr3)) = (App (Infix Comp expr1 expr2) expr3, [LintComp (App expr1 (App expr2 expr3)) (App (Infix Comp expr1 expr2) expr3)]) 
+lintComp (App expr1 (App expr2 expr3)) = if auxComp (expr3) then
+                                          (App (Infix Comp newExpr1 expr2) expr3, sugg1 ++ [LintComp (App expr1 (App expr2 expr3)) (App (Infix Comp newExpr1 expr2) expr3)])
+                                         else
+                                         (App (Infix Comp newExpr1 (fst (getComp(fst (lintComp (App expr2 expr3)))))) (snd (getComp(fst (lintComp (App expr2 expr3))))), sugg1 ++ snd (lintComp (App expr2 expr3)) ++ [LintComp (App newExpr1 (fst (lintComp (App expr2 expr3)))) (App (Infix Comp expr1 (fst (getComp(fst (lintComp (App expr2 expr3)))))) (snd (getComp(fst (lintComp (App expr2 expr3))))))])
+                                          where (newExpr1, sugg1) = lintComp expr1
 
 lintComp (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
                               where (newExpr1, sugg1) = lintComp expr1
