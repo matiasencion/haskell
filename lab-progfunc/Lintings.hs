@@ -3,6 +3,7 @@ module Lintings where
 import AST
 import LintTypes
 
+-- Matias Sencion - 5.263.989-9 - Grupo 6
 
 --------------------------------------------------------------------------------
 -- AUXILIARES
