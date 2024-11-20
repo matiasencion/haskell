@@ -134,10 +134,10 @@ lintRedBool expr = (expr, [])
 -- Construye sugerencias de la forma (LintRedIf e r)
 
 lintRedIfCond :: Linting Expr
-lintRedIfCond (If (Lit (LitBool True)) expr1 expr2) = (newExpr1, sugg1 ++ [LintRedIf (If (Lit (LitBool True)) expr1 expr2) newExpr1])
+lintRedIfCond (If (Lit (LitBool True)) expr1 expr2) = (newExpr1, sugg1 ++ [LintRedIf (If (Lit (LitBool True)) newExpr1 expr2) newExpr1])
                                                     where (newExpr1, sugg1) = lintRedIfCond expr1
 
-lintRedIfCond (If (Lit (LitBool False)) expr1 expr2) = (newExpr2, sugg2 ++ [LintRedIf (If (Lit (LitBool False)) expr1 expr2) newExpr2])
+lintRedIfCond (If (Lit (LitBool False)) expr1 expr2) = (newExpr2, sugg2 ++ [LintRedIf (If (Lit (LitBool False)) expr1 newExpr2) newExpr2])
                                                     where (newExpr2, sugg2) = lintRedIfCond expr2
 
 lintRedIfCond (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
@@ -268,7 +268,7 @@ lintNull expr = (expr, [])
 -- Construye sugerencias de la forma (LintAppend e r)
 
 lintAppend :: Linting Expr
-lintAppend (Infix Append (Infix Cons expr1 (Lit (LitNil))) expr2) = (Infix Cons newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintAppend (Infix Cons expr1 (Infix Append (Lit (LitNil)) expr2)) (Infix Cons newExpr1 newExpr2)])
+lintAppend (Infix Append (Infix Cons expr1 (Lit (LitNil))) expr2) = (Infix Cons newExpr1 newExpr2, sugg1 ++ sugg2 ++ [LintAppend (Infix Cons newExpr1 (Infix Append (Lit (LitNil)) newExpr2)) (Infix Cons newExpr1 newExpr2)])
                                                                     where (newExpr1, sugg1) = lintAppend expr1
                                                                           (newExpr2, sugg2) = lintAppend expr2
 
@@ -309,9 +309,9 @@ getComp (App (Infix Comp expr1 expr2) expr3) = (Infix Comp expr1 expr2, expr3)
 
 lintComp :: Linting Expr
 lintComp (App expr1 (App expr2 expr3)) = if auxComp (expr3) then
-                                          (App (Infix Comp newExpr1 expr2) expr3, sugg1 ++ [LintComp (App expr1 (App expr2 expr3)) (App (Infix Comp newExpr1 expr2) expr3)])
+                                          (App (Infix Comp newExpr1 expr2) expr3, sugg1 ++ [LintComp (App newExpr1 (App expr2 expr3)) (App (Infix Comp newExpr1 expr2) expr3)])
                                          else
-                                         (App (Infix Comp newExpr1 (fst (getComp(fst (lintComp (App expr2 expr3)))))) (snd (getComp(fst (lintComp (App expr2 expr3))))), sugg1 ++ snd (lintComp (App expr2 expr3)) ++ [LintComp (App newExpr1 (fst (lintComp (App expr2 expr3)))) (App (Infix Comp expr1 (fst (getComp(fst (lintComp (App expr2 expr3)))))) (snd (getComp(fst (lintComp (App expr2 expr3))))))])
+                                         (App (Infix Comp newExpr1 (fst (getComp(fst (lintComp (App expr2 expr3)))))) (snd (getComp(fst (lintComp (App expr2 expr3))))), sugg1 ++ snd (lintComp (App expr2 expr3)) ++ [LintComp (App newExpr1 (fst (lintComp (App expr2 expr3)))) (App (Infix Comp newExpr1 (fst (getComp(fst (lintComp (App expr2 expr3)))))) (snd (getComp(fst (lintComp (App expr2 expr3))))))])
                                           where (newExpr1, sugg1) = lintComp expr1
 
 lintComp (Infix op expr1 expr2) = (Infix op newExpr1 newExpr2, sugg1 ++ sugg2)
